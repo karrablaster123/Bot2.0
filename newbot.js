@@ -136,7 +136,7 @@ process.on('SIGTERM', async () => {
 	await amateurQueueMessage.delete();
   //await logChannel.send('The bot is shutting down.');
   await sealGuild.commands.set([]);
-  await amateurQueueChannel.send('The bot has shut down');
+  await amateurQueueChannel.send('The bot has shut down. Please contact karra for a restart!');
 
 	client.destroy();
 	console.info('Shutdown Completed!');
@@ -261,7 +261,7 @@ function processCommands(cI){
 
   if(cI.commandName == 'qa'){
     //console.log(cI);
-    
+
     if(amateurQueue.length > 0 && amateurQueueExist){
 
       cI.editReply({content: amateurQueue.join('\r\n').toString()});
