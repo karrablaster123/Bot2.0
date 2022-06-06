@@ -155,7 +155,7 @@ myEventEmitter.on('amateurQueueJoin', async (user, interaction) =>{
   else{
     await interaction.editReply({ content: 'You are now in the Queue', ephemeral: true });
     amateurQueue.push(user);
-    setTimeout(() => {myEventEmitter.emit('amateurQueueLeave', user, false)}, 5000);
+    setTimeout(() => {myEventEmitter.emit('amateurQueueLeave', user, false)}, 7200000);
     amateurQueueEmbed.setDescription(amateurQueue.join('\r\n').toString());
     amateurQueueMessage.edit({embeds: [amateurQueueEmbed], components: [amateurQueueData]});
   }
