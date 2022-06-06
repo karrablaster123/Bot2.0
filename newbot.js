@@ -129,6 +129,23 @@ client.on('interactionCreate', async interaction => {
 
 });
 
+process.on('SIGTERM', async () => {
+
+	console.info('SIGTERM signal received.');
+
+	await amateurQueueMessage.delete();
+  //await logChannel.send('The bot is shutting down.');
+  await sealGuild.commands.set([]);
+  await amateurQueueChannel.send('The bot has shut down');
+
+	client.destroy();
+	console.info('Shutdown Completed!');
+	process.exit(0);
+
+
+
+});
+
 myEventEmitter.on('amateurQueueJoin', async (user, interaction) =>{
   //console.log(user);
   if(amateurQueue.some(u => u.id == user.id)){
@@ -243,8 +260,8 @@ function processCommands(cI){
 
 
   if(cI.commandName == 'qa'){
-    console.log(cI);
-
+    //console.log(cI);
+    
     if(amateurQueue.length > 0 && amateurQueueExist){
 
       cI.editReply({content: amateurQueue.join('\r\n').toString()});
