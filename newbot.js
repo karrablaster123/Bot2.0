@@ -176,6 +176,7 @@ myEventEmitter.on('amateurQueueLeave', async (user, interaction) =>{
 
     if(!interaction){
       await user.send('You have been removed from the Queue as a precautionary measure').catch(console.error);
+      await logMessage(user.toString() + ' removed');
       return;
     }
 
@@ -191,6 +192,7 @@ myEventEmitter.on('amateurQueueLeave', async (user, interaction) =>{
 
     if(!interaction){
       console.log("That user has already left the queue, or the queue has completed");
+      await logMessage(user.toString() + ' couldn\t be removed from Queue');
       return;
     }
 
