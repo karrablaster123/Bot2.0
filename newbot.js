@@ -15,6 +15,8 @@ penaltyList = [], registerList = [], logChannel, amateurQueue =[], queueEmoji,
 amateurQueueExist = false, amateurQueueEmbed, amateurQueueData,
 lastPingAmateur = 0, totalQueue = 10;
 
+var startUp = false;
+
 
 client.login(token);
 
@@ -252,7 +254,13 @@ myEventEmitter.on('amateurQueueStart', async () => {
 
     amateurQueueMessage = await amateurQueueChannel.send({embeds: [amateurQueueEmbed], components: [amateurQueueData]});
 
-    console.log("Setup Complete!");
+
+    if(!startUp){
+      console.log("Setup Complete!");
+      startUp = true;
+    }
+
+
 
 
   }
