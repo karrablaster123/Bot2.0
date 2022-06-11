@@ -13,7 +13,7 @@ var amateurQueue = [];
 var amateurQueueChannel, sealGuild, amateurQueueMessage, canPingAmateur = true,
 penaltyList = [], registerList = [], logChannel, amateurQueue =[], queueEmoji,
 amateurQueueExist = false, amateurQueueEmbed, amateurQueueData,
-lastPingAmateur = 0, totalQueue = 10;
+lastPingAmateur = 0, totalQueue = 10, timedRemoval = new Map();
 
 var startUp = false;
 
@@ -157,7 +157,7 @@ myEventEmitter.on('amateurQueueJoin', async (user, interaction) =>{
   else{
     await interaction.editReply({ content: 'You are now in the Queue', ephemeral: true });
     amateurQueue.push(user);
-    setTimeout(() => {myEventEmitter.emit('amateurQueueLeave', user, false)}, 7200000);
+    timedRemoval.set(user.id, setTimeout(() => {myEventEmitter.emit('amateurQueueLeave', user, false)}, 7200000));
     amateurQueueEmbed.setDescription(amateurQueue.join('\r\n').toString());
     amateurQueueMessage.edit({embeds: [amateurQueueEmbed], components: [amateurQueueData]});
   }
@@ -165,6 +165,10 @@ myEventEmitter.on('amateurQueueJoin', async (user, interaction) =>{
   if(amateurQueue.length == totalQueue){
     amateurQueueExist = false;
     myEventEmitter.emit('amateurQueueStart');
+
+    for(to of timedRemoval){
+      clearTimeout(to);
+    }
 
   }
 
@@ -175,6 +179,8 @@ myEventEmitter.on('amateurQueueLeave', async (user, interaction) =>{
     amateurQueue.splice(amateurQueue.indexOf(user), 1);
     amateurQueueEmbed.setDescription(amateurQueue.join('\r\n').toString());
     amateurQueueMessage.edit({embeds: [amateurQueueEmbed], components: [amateurQueueData]});
+
+    clearTimeout(timedRemoval.get(user.id));
 
     if(!interaction){
       await user.send('You have been removed from the Queue as a precautionary measure').catch(console.error);
