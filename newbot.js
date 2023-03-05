@@ -150,11 +150,11 @@ process.on('SIGTERM', async () => {
 
 myEventEmitter.on('amateurQueueJoin', async (user, interaction) =>{
   //console.log(user);
-  if(amateurQueue.some(u => u.id == user.id)){
+  if(amateurQueue.some(u => u.id == user.id)) {
     await interaction.editReply({ content: 'You are already in Queue', ephemeral: true });
     return;
   }
-  else{
+  else {
     await interaction.editReply({ content: 'You are now in the Queue', ephemeral: true });
     amateurQueue.push(user);
     timedRemoval.set(user.id, setTimeout(() => {myEventEmitter.emit('amateurQueueLeave', user, false)}, 7200000));
