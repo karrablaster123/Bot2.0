@@ -173,6 +173,7 @@ myEventEmitter.on('amateurQueueJoin', async (user, interaction) =>{
     amateurQueue.push(user);
     timedRemoval.set(user.id, setTimeout(() => {myEventEmitter.emit('amateurQueueLeave', user, false)}, 7200000));
     amateurQueueEmbed.setDescription(amateurQueue.join('\r\n').toString());
+    amateurQueueEmbed.setTitle('Current Queue: ' + amateurQueue.length + '/' + totalQueue);
     amateurQueueMessage.edit({embeds: [amateurQueueEmbed], components: [amateurQueueData]});
   }
 
