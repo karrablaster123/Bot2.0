@@ -4,6 +4,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const {EventEmitter} = require('events');
+const { parse } = require('path');
 
 
 const myEventEmitter = new EventEmitter();
@@ -14,6 +15,12 @@ var amateurQueueChannel, sealGuild, amateurQueueMessage, canPingAmateur = true,
 penaltyList = [], registerList = [], logChannel, amateurQueue =[], queueEmoji,
 amateurQueueExist = false, amateurQueueEmbed, amateurQueueData,
 lastPingAmateur = 0, totalQueue = 10, timedRemoval = new Map();
+
+var sealGuildID = '1291500055198437416';
+var amateurQueueChannelID = '1291501751999922176';
+var logChannelID = '1291955888202059797';
+var completedQueueChannelID = '1291958218255499387';
+var adminRoleID = '1291500604283420732';
 
 var startUp = false;
 
@@ -28,8 +35,8 @@ client.once('ready', () => {
 });
 
 async function botSetup(bot){
-
-  sealGuild = bot.guilds.cache.get('681176035504422965');
+  console.log("Setting up bot...");
+  sealGuild = bot.guilds.cache.get(sealGuildID);
 
 
   try{
@@ -44,9 +51,9 @@ async function botSetup(bot){
     process.exit(1);
   }
 
-  amateurQueueChannel = sealGuild.channels.cache.get('791131105050099742');
-  logChannel = sealGuild.channels.cache.get('790982435147350036');
-  queueEmoji = sealGuild.emojis.cache.get('700831087085224046');
+  amateurQueueChannel = sealGuild.channels.cache.get(amateurQueueChannelID);
+  logChannel = sealGuild.channels.cache.get(logChannelID);
+  queueEmoji = "👍";
 
 
 
@@ -64,12 +71,12 @@ async function botSetup(bot){
   await client.application.commands.set([]);
   await guildCommandManager.set([]);
 
-
- await guildCommandManager.create({
-    name: 'pingamateur',
-    description: 'Ping Amateur Queue',
+  console.log("Creating commands...");
+  await guildCommandManager.create({
+    name: 'pingqueue',
+    description: 'Ping Queue',
   }).catch(console.error);
-
+  console.log("Creating commands...2");
   await guildCommandManager.create({
     name: 'remove',
     description: 'Removes a user from queue',
@@ -80,19 +87,25 @@ async function botSetup(bot){
       required: true,
     }],
   }).catch(console.error);
-
+  console.log("Creating commands...3");
   await guildCommandManager.create({
     name: 'qa',
     description: 'Sends the current amateur queue list',
   }).catch(console.error);
+  console.log("Creating commands...4");
+  await guildCommandManager.create({
+    name: 'kys',
+    description: 'kms ',
+  }).catch(console.error);
 
-  let completedQueueChannel = sealGuild.channels.cache.get('982619153691193415');
+  console.log("Getting Completed Queue channel data and deleting.");
+  let completedQueueChannel = sealGuild.channels.cache.get(completedQueueChannelID);
   await completedQueueChannel.messages.fetch();
   if(completedQueueChannel.messages.cache.size > 10){
     //await completedQueueChannel.send("1v1 mid me desire are u afraid?");
     completedQueueChannel.bulkDelete(completedQueueChannel.messages.cache.size).catch(console.error);
   }
-
+  console.log("Getting Amateur Queue channel data.");
   await amateurQueueChannel.messages.fetch();
 
   myEventEmitter.emit('amateurQueueStart');
@@ -101,7 +114,7 @@ async function botSetup(bot){
 }
 
 client.on('interactionCreate', async interaction => {
-  if(interaction.guild.id != 681176035504422965){
+  if(interaction.guild.id != parseInt(sealGuildID, 10)){
     return;
   }
 
@@ -131,14 +144,14 @@ client.on('interactionCreate', async interaction => {
 
 });
 
-process.on('SIGTERM', async () => {
+process.once('SIGTERM', async () => {
 
 	console.info('SIGTERM signal received.');
 
 	await amateurQueueMessage.delete();
   //await logChannel.send('The bot is shutting down.');
   await sealGuild.commands.set([]);
-  await amateurQueueChannel.send('The bot has shut down. Please contact karra for a restart!');
+  await amateurQueueChannel.send('The bot has shut down. Please contact joe for a restart!');
 
 	client.destroy();
 	console.info('Shutdown Completed!');
@@ -148,8 +161,9 @@ process.on('SIGTERM', async () => {
 
 });
 
+
 myEventEmitter.on('amateurQueueJoin', async (user, interaction) =>{
-  //console.log(user);
+
   if(amateurQueue.some(u => u.id == user.id)) {
     await interaction.editReply({ content: 'You are already in Queue', ephemeral: true });
     return;
@@ -217,7 +231,7 @@ myEventEmitter.on('amateurQueueLeave', async (user, interaction) =>{
 });
 
 myEventEmitter.on('amateurQueueStart', async () => {
-
+  console.log("Starting Queue");
   if(amateurQueueExist){
     console.log("Queue already exists!");
 
@@ -245,8 +259,7 @@ myEventEmitter.on('amateurQueueStart', async () => {
       .setColor('#ADD8E6')
       .setTitle('Current Queue')
       .setDescription(' ');
-
-    await amateurQueueChannel.send("Poi");
+    console.log("Clearing Queue Channel");
     amateurQueueChannel.bulkDelete(amateurQueueChannel.messages.cache.size).catch(console.error);
 
     if(amateurQueue.length == totalQueue){
@@ -258,6 +271,8 @@ myEventEmitter.on('amateurQueueStart', async () => {
         amateurQueue = [];
     }
 
+
+    console.log("Sending Queue Message");
     amateurQueueMessage = await amateurQueueChannel.send({embeds: [amateurQueueEmbed], components: [amateurQueueData]});
 
 
@@ -290,7 +305,7 @@ function processCommands(cI){
   else if(cI.commandName == 'remove'){
 
 
-    if(cI.member._roles.includes('681176329554886714') || cI.member._roles.includes('696355198083399730')){
+    if(cI.member._roles.includes(adminRoleID)){
       myEventEmitter.emit('amateurQueueLeave', cI.options.getUser('user'), cI);
 
 
@@ -303,12 +318,35 @@ function processCommands(cI){
 
     }
   }
-  else if(cI.commandName == 'pingamateur'){
-    pingAmateur(cI);
+  else if(cI.commandName == 'pingqueue'){
+    cI.editReply({content: 'This does not currently work.'});;
 
   }
 
+  else if (cI.commandName == 'kys'){
+    if (cI.member._roles.includes(adminRoleID)){
+      death(cI)
+      
+    }
+    else{
+      cI.editReply({content: 'No I don\'t think so!'});
+    }
+  }
+
   //return reply;
+}
+
+async function death(cI){
+  await cI.editReply({content: 'kbye!'});
+  console.log("Death comes for us all.");
+  await amateurQueueMessage.delete();
+  //await logChannel.send('The bot is shutting down.');
+  await sealGuild.commands.set([]);
+  await amateurQueueChannel.send('The bot has shut down. Please contact joe for a restart!');
+
+	client.destroy();
+	console.info('Shutdown Completed!');
+	process.exit(0);
 }
 
 async function pingAmateur(cI){
@@ -356,28 +394,30 @@ async function pingAmateur(cI){
 
 
 async function queuePopped(){
-  let completedQueueChannel = sealGuild.channels.cache.get('982619153691193415');
-  let lobbyMaker = [];
-
+  let completedQueueChannel = sealGuild.channels.cache.get(completedQueueChannelID);
+  //let lobbyMaker = [];
+  /*
   await sealGuild.members.fetch();
   for (u of amateurQueue){
     let member = sealGuild.members.cache.find(m => m.user.id == u.id);
-    if(member.roles.cache.some(r => r.id == 681176329554886714) || member.roles.cache.some(r => r.id == 696355198083399730)){
+    if(member.roles.cache.some(r => r.id == parseInt(adminRoleID, 10))){
       lobbyMaker.push(member.user);
     }
 
-  }
+  } 
+  */
 
+  completedQueueChannel.send('Queue popped! \n' + amateurQueue.join('\r\n').toString());
+  /*
   if(lobbyMaker.length > 0){
-    completedQueueChannel.send('Queue popped! \n' + amateurQueue.join('\r\n').toString() + '\nLobby Makers: ' + lobbyMaker.join('\r\n').toString());
+    completedQueueChannel.send('Queue popped! \n' + amateurQueue.join('\r\n').toString());
   }
   else{
 
-    let adminRole = await sealGuild.roles.cache.get('681176329554886714');
-    let modRole = await sealGuild.roles.cache.get('696355198083399730');
-
-    completedQueueChannel.send('Queue popped! \n' + amateurQueue.join('\r\n').toString() + '\nLobby Makers:\n' + adminRole.toString() + " " + modRole.toString());
-  }
+    let adminRole = await sealGuild.roles.cache.get(adminRoleID);
+    
+    //completedQueueChannel.send('Queue popped! \n' + amateurQueue.join('\r\n').toString() + '\nLobby Makers:\n' + adminRole.toString());
+  }*/
 }
 
 async function logMessage(msg) {
