@@ -179,12 +179,12 @@ myEventEmitter.on('amateurQueueJoin', async (user, interaction) =>{
 
   if(amateurQueue.length == totalQueue){
     amateurQueueExist = false;
+    timedRemoval.forEach((value) => {
+      clearTimeout(value);
+    })
     myEventEmitter.emit('amateurQueueStart');
-
-    for(to of timedRemoval){
-      clearTimeout(to);
-    }
-
+    
+    
   }
 
 });
@@ -216,7 +216,7 @@ myEventEmitter.on('amateurQueueLeave', async (user, interaction) =>{
 
     if(!interaction){
       console.log("That user has already left the queue, or the queue has completed");
-      await logMessage(user.toString() + ' couldn\t be removed from Queue');
+      await logMessage(user.toString() + ' couldn\'t be removed from Queue');
       return;
     }
 
