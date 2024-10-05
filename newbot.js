@@ -193,6 +193,7 @@ myEventEmitter.on('amateurQueueLeave', async (user, interaction) =>{
   if(amateurQueue.some(u => u.id == user.id)){
     amateurQueue.splice(amateurQueue.indexOf(user), 1);
     amateurQueueEmbed.setDescription(amateurQueue.join('\r\n').toString());
+    amateurQueueEmbed.setTitle('Current Queue: ' + amateurQueue.length + '/' + totalQueue);
     amateurQueueMessage.edit({embeds: [amateurQueueEmbed], components: [amateurQueueData]});
 
     clearTimeout(timedRemoval.get(user.id));
