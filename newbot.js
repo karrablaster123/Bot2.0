@@ -182,6 +182,7 @@ myEventEmitter.on('amateurQueueJoin', async (user, interaction) =>{
     timedRemoval.forEach((value) => {
       clearTimeout(value);
     })
+    await amateurQueueMessage.delete();
     myEventEmitter.emit('amateurQueueStart');
     
     
