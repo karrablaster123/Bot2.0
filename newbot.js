@@ -16,11 +16,11 @@ penaltyList = [], registerList = [], logChannel, amateurQueue =[], queueEmoji,
 amateurQueueExist = false, amateurQueueEmbed, amateurQueueData,
 lastPingAmateur = 0, totalQueue = 10, timedRemoval = new Map();
 
-var sealGuildID = '1291500055198437416';
-var amateurQueueChannelID = '1291501751999922176';
-var logChannelID = '1291955888202059797';
-var completedQueueChannelID = '1291958218255499387';
-var adminRoleID = '1291500604283420732';
+var sealGuildID = '1334856876604526675';
+var amateurQueueChannelID = '1334857461785559040';
+var logChannelID = '1336801205522796676';
+var completedQueueChannelID = '1338328338845925457';
+var adminRoleID = '1334857031349305384';
 
 var startUp = false;
 
